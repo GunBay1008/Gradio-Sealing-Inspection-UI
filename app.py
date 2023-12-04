@@ -1,4 +1,5 @@
 # Gradio App
+import os
 import subprocess
 
 import gradio as gr
@@ -9,6 +10,9 @@ async def start_training(selected_model, data_file_path, epochs_count, batch_siz
         return "Please upload a data file."
     elif selected_model is None:
         return "Please choose a pre-trained model"
+
+    if not os.path.exists("temp"):
+        os.makedirs("temp")
 
     with open("temp/training_status.txt", "w") as file:
         file.write("Training is about to Start!")
