@@ -168,3 +168,4 @@ valid/
 test/
 *.pt
 temp/
+*.jpg

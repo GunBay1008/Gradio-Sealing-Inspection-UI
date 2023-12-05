@@ -14,6 +14,8 @@ def train_yolo(selected_model, data_file_path, epochs_count, batch_size):
     shutil.copy(data_file_path, data_temp_path)
 
     model = YOLO(selected_model)
+    with open("temp/training_status.txt", "w") as file:
+        file.write("Training Started")
     results = model.train(data=data_temp_path, epochs=epochs_count, batch=batch_size)
     # At the end of your train_yolo function
     with open("temp/training_status.txt", "w") as file:
