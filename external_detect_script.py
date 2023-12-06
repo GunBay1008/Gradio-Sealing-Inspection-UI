@@ -1,4 +1,3 @@
-import argparse
 import os
 
 from PIL import Image
@@ -31,14 +30,3 @@ def detect_yolo(selected_model, image_files, conf_value):
         im.show()  # show image
         detected_image = im.save("results.jpg")  # save image
     return detected_image
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run YOLO Training")
-    parser.add_argument("selected_model", type=str, help="Selected YOLO model")
-    parser.add_argument("image_files", type=str, help="Selecte images")
-    parser.add_argument("conf_value", type=float, help="Batch size for training")
-
-    args = parser.parse_args()
-
-    detect_yolo(args.selected_model, args.image_files, args.conf_value)

@@ -4,6 +4,10 @@ import shutil
 import subprocess
 
 import gradio as gr
+from PIL import Image
+from ultralytics import YOLO
+
+from external_detect_script import detect_yolo
 
 
 async def start_training(selected_model, data_file_path, epochs_count, batch_size):
@@ -101,15 +105,7 @@ def start_detection(selected_model, image_files, conf_value):
         image_files, os.path.join(temp_dir, os.path.basename(image_files))
     )
 
-    subprocess.Popen(
-        [
-            "python",
-            "external_detect_script.py",
-            model_file_path,
-            image_file_path,
-            str(conf_value),
-        ]
-    )
+    detect_yolo(model_file_path, image_file_path, conf_value)
 
 
 def clear_directory():
