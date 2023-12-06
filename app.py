@@ -73,39 +73,29 @@ def start_detection(selected_model, image_files, conf_value):
     if selected_model is None:
         return "Please choose a .pt file"
 
-    # temp_dir = "temp"
-    # if not os.path.exists(temp_dir):
-    #     os.makedirs(temp_dir)
-    # print(selected_model)
-
-    # model_file_path = os.path.join(temp_dir, "model.pt")
-    # with open(model_file_path, "wb") as file:
-    #     file.write(selected_model)
-    # print(model_file_path)
-
-    # image_file_path = os.path.join(temp_dir, "pic.jpeg")
-    # with open(image_file_path, "wb") as file:
-    #     file.write(image_files)
-    # print(image_file_path)
-
-    # Use the selected_model path directly, as Gradio provides the file path
+    allowed_extensions = {"jpg", "jpeg", "png"}
 
     temp_dir = "temp"
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
 
-    # Assuming selected_model and image_files are file paths
     # Move the selected model file
     model_file_path = shutil.move(
         selected_model, os.path.join(temp_dir, os.path.basename(selected_model))
     )
 
-    # Move the image file
-    image_file_path = shutil.move(
-        image_files, os.path.join(temp_dir, os.path.basename(image_files))
-    )
+    # Handle multiple image files
+    image_file_paths = []
+    for image_file in image_files:
+        if image_file.lower().endswith(tuple(allowed_extensions)):
+            image_file_path = shutil.move(
+                image_file, os.path.join(temp_dir, os.path.basename(image_file))
+            )
+            image_file_paths.append(image_file_path)
+        else:
+            return f"Unsupported file type: {os.path.basename(image_file)}"
 
-    detect_yolo(model_file_path, image_file_path, conf_value)
+    return detect_yolo(model_file_path, image_file_paths, conf_value)
 
 
 def clear_directory():
@@ -154,10 +144,10 @@ with gr.Blocks() as demo:
         with gr.Tab("Detection"):
             # Define the inputs for detection
             selected_model = gr.File(label="Model Path (.pt file)", type="filepath")
-            image_files = gr.Image(label="Upload images", type="filepath")
+            image_files = gr.Files(label="Upload images", type="filepath")
             conf_value = gr.Slider(0.0, 1.0, label="Conf Value")
             detect_button = gr.Button("Start Detection")
-            detection_output = gr.Image(label="Detection Output")
+            detection_output = gr.Gallery(label="Detection Output")
             clear_temp_button = gr.Button("Clear Temp Folder")
 
             # When the button is clicked, call start_detection
