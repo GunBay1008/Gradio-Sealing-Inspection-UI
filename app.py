@@ -112,6 +112,26 @@ def start_detection(selected_model, image_files, conf_value):
     )
 
 
+def clear_directory():
+    folder_path = r"temp"
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+                print("file successfully deleted!")
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+                print("directory successfully deleted!")
+        except Exception as e:
+            print(f"Failed to delete {file_path}. Reason: {e}")
+
+
+def clear_directory_wrapper():
+    clear_directory()
+    print("Temp folder cleared!")
+
+
 with gr.Blocks() as demo:
     with gr.Tabs() as tabs:
         with gr.Tab("Training"):
@@ -125,6 +145,7 @@ with gr.Blocks() as demo:
             batch_size = gr.Slider(1, 128, label="Batch Size")
             train_button = gr.Button("Start Training")
             train_status_output = gr.Textbox(label="Training Status")
+            clear_temp_button = gr.Button("Clear Temp Folder")
 
             # When the button is clicked, call start_training
             train_button.click(
@@ -132,6 +153,7 @@ with gr.Blocks() as demo:
                 inputs=[model_dropdown, data_file, epochs_count, batch_size],
                 outputs=train_status_output,
             )
+            clear_temp_button.click(fn=clear_directory_wrapper, inputs=[], outputs=[])
 
         with gr.Tab("Detection"):
             # Define the inputs for detection
@@ -140,6 +162,7 @@ with gr.Blocks() as demo:
             conf_value = gr.Slider(0.0, 1.0, label="Conf Value")
             detect_button = gr.Button("Start Detection")
             detection_output = gr.Image(label="Detection Output")
+            clear_temp_button = gr.Button("Clear Temp Folder")
 
             # When the button is clicked, call start_detection
             detect_button.click(
@@ -147,6 +170,8 @@ with gr.Blocks() as demo:
                 inputs=[selected_model, image_files, conf_value],
                 outputs=detection_output,
             )
+
+            clear_temp_button.click(fn=clear_directory_wrapper, inputs=[], outputs=[])
 
 # Launch the app with the tabbed interface
 demo.launch(share=True)
